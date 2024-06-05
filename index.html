@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Application</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .footer {
+            background-color: white;
+            padding: 1em;
+            display: flex;
+            justify-content: center;
+        }
+        .footer .container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 36em;
+            margin: auto;
+        }
+        .footer .row {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        .footer .row img {
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        .footer .row input {
+            flex-grow: 1;
+            margin: 0 1em;
+            padding: 0.5em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .footer .row input:focus {
+            outline: none;
+        }
+        .footer .row input::placeholder {
+            color: #888;
+        }
+        .footer .footer-note {
+            text-align: right;
+            margin-top: -1em;
+            color: #007bff;
+            font-size: 0.75em;
+        }
+        .chat-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1em;
+        }
+        .chat-message {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1em;
+        }
+        .chat-message .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 1em;
+        }
+        .chat-message.sent {
+            flex-direction: row-reverse;
+            text-align: right;
+        }
+        .chat-message.sent .avatar {
+            margin-left: 1em;
+            margin-right: 0;
+        }
+        .chat-message .text {
+            padding: 0.5em 1em;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+            max-width: 60%;
+        }
+        .chat-message.sent .text {
+            background-color: #007bff;
+            color: white;
+        }
+        .chat-message .timestamp {
+            font-size: 0.75em;
+            color: #888;
+            margin-top: 0.5em;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container" id="chat-container"></div>
+    <div class="footer">
+        <div class="container">
+            <div class="row">
+                <img src="" alt="avatar" id="user-avatar" onclick="location.reload()">
+                <input type="text" id="message-input" placeholder="message" onkeydown="if(event.key === 'Enter') sendMessage()">
+            </div>
+            <div class="footer-note">
+                simple chat app built by <a href="https://www.instagram.com/prantik.medhi?igsh=MTB5Y2R0ZTVldTJ3ZA==" target="_blank">Prantik</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        const userId = generateUUID();
+        const avatarUrl = `https://robohash.org/${userId}?bgset=bg2`;
+        document.getElementById('user-avatar').src = avatarUrl;
+
+        const messages = [];
+
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            if (input.value.trim() === '') return;
+
+            const message = {
+                userId,
+                avatar: avatarUrl,
+                text: input.value,
+                timestamp: new Date().toLocaleTimeString()
+            };
+            messages.push(message);
+            input.value = '';
+            refreshChat();
+        }
+
+        function refreshChat() {
+            const chatContainer = document.getElementById('chat-container');
+            chatContainer.innerHTML = '';
+            messages.forEach(({ userId: msgUserId, avatar, text, timestamp }) => {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('chat-message');
+                if (msgUserId === userId) messageElement.classList.add('sent');
+
+                const avatarElement = document.createElement('img');
+                avatarElement.src = avatar;
+                avatarElement.classList.add('avatar');
+
+                const textElement = document.createElement('div');
+                textElement.classList.add('text');
+                textElement.textContent = text;
+
+                const timestampElement = document.createElement('div');
+                timestampElement.classList.add('timestamp');
+                timestampElement.textContent = timestamp;
+
+                messageElement.appendChild(avatarElement);
+                messageElement.appendChild(textElement);
+                messageElement.appendChild(timestampElement);
+
+                chatContainer.appendChild(messageElement);
+            });
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+    </script>
+</body>
+</html>
